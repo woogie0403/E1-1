@@ -1,0 +1,13 @@
+# System & OS
+.DS_Store
+Thumbs.db
+
+# Sensitive Information
+*.key
+*.pem
+*.env
+token.txt
+password.txt
+
+# Temporary / logs
+*.log
