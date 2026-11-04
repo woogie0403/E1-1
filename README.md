@@ -429,7 +429,10 @@ git config --list
 # init.defaultbranch=main
 ```
 
-#### 🌐 GitHub 저장소 연동 증거 화면
+#### 🖥️ Git 사용자 설정 및 config 확인 터미널 캡처
+![Git 사용자 설정 및 config 확인](docs/screenshots/term_step7_git.png)
+
+#### 🌐 GitHub 원격 저장소 연동 증거 화면
 ![GitHub 저장소 연동 증거](docs/screenshots/github_repo.png)
 
 ---
