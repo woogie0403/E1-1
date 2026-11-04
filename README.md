@@ -31,7 +31,7 @@ curl http://localhost:8080
 ## 📑 목차 (Table of Contents)
 
 1. [프로젝트 개요 (Mission Overview)](#-1-프로젝트-개요-mission-overview)
-2. [전체 시스템 아키텍처 구조도 (Architecture Diagram)](#-2-전체-시스템-아키텍처-구조도-architecture-diagram)
+2. [전체 시스템 아키텍처 및 디렉토리 구조 (Architecture & Structure)](#-2-전체-시스템-아키텍처-및-디렉토리-구조-architecture--structure)
 3. [실행 환경 상세 스펙 (System Environment)](#-3-실행-환경-상세-스펙-system-environment)
 4. [과제 요구사항 100% 매칭 체크리스트 (Checklist)](#-4-과제-요구사항-100-매칭-체크리스트-checklist)
 5. [단계별 수행 로그 및 증거 (Execution Logs & Evidences)](#-5-단계별-수행-로그-및-증거-execution-logs--evidences)
@@ -59,7 +59,7 @@ curl http://localhost:8080
 
 ---
 
-## 🏗️ 2. 전체 시스템 아키텍처 구조도 (Architecture Diagram)
+## 🏗️ 2. 전체 시스템 아키텍처 및 디렉토리 구조 (Architecture & Structure)
 
 본 워크스테이션은 윈도우 호스트 위에서 경량화된 리눅스 커널(WSL2)과 Docker 가상화 기술을 결합하여 완벽히 격리된 웹 서버 환경을 제공합니다:
 
@@ -105,43 +105,23 @@ flowchart LR
     LinuxCLI -->|"도커 CLI 명령 전달"| DockerEngine
 ```
 
-<details>
-<summary><b>📐 텍스트 기반 아키텍처 다이어그램 (ASCII View 펼치기)</b></summary>
+---
+
+### 📂 디렉토리 및 파일 구성 (Project Structure)
+
+본 워크스테이션 저장소는 불필요한 파일을 배제하고 과제 평가 및 재현에 필요한 핵심 파일들로만 엄격히 구성되었습니다:
 
 ```text
-┌────────────────────────────────────────────────────────────────────────────────────────┐
-│ [호스트 시스템] Microsoft Windows 10 Home (Host OS)                                     │
-│  - 웹 브라우저 (Chrome / Edge): http://localhost:8080, 8081, 8082                      │
-│  - VS Code IDE: 코드 편집 및 버전 관리                                                │
-└──────────────────────────────────────────┬─────────────────────────────────────────────┘
-                                           │ 포트 포워딩 (Port Forwarding)
-                                           ▼
-┌────────────────────────────────────────────────────────────────────────────────────────┐
-│ [가상화 서브시스템] WSL 2 (Ubuntu 24.04 LTS / Linux Kernel)                            │
-│  - 작업 경로: /home/jaeuk/workspace-lab                                                 │
-│  - 리눅스 권한 체계 검증: chmod 755 / 644 / 700                                        │
-│                                                                                        │
-│   ┌────────────────────────────────────────────────────────────────────────────────┐   │
-│   │ [컨테이너 런타임] Docker Engine Daemon (v29.9.2)                               │   │
-│   │                                                                                │   │
-│   │   ┌──────────────────────────┐     ┌──────────────────────────┐               │   │
-│   │   │ 컨테이너: my-web-8080    │     │ 컨테이너: my-web-8081    │               │   │
-│   │   │  (Port 8080 -> 80)       │     │  (Port 8081 -> 80)       │               │   │
-│   │   │  Nginx:alpine Web Server │     │  Nginx:alpine Web Server │               │   │
-│   │   └──────────────────────────┘     └──────────────────────────┘               │   │
-│   │                                                                                │   │
-│   │   ┌──────────────────────────┐     ┌──────────────────────────┐               │   │
-│   │   │ 컨테이너: bind-test      │     │ 컨테이너: vol-test / 2   │               │   │
-│   │   │  (Port 8082 -> 80)       │     │  Ubuntu Container        │               │   │
-│   │   └────────────┬─────────────┘     └────────────┬─────────────┘               │   │
-│   └────────────────┼────────────────────────────────┼──────────────────────────────┘   │
-│                    │                                │                                  │
-│   [바인드 마운트: Bind Mount]             [도커 볼륨: Named Volume]                   │
-│   호스트 ./app 폴더 실시간 동기화          독립 볼륨 'mydata' (컨테이너 삭제 후 영속)  │
-└────────────────────────────────────────────────────────────────────────────────────────┘
+E1-1/
+├── app/
+│   └── index.html          # Nginx 커스텀 웹 페이지 (바인드 마운트 실시간 코드 변경 검증용)
+├── docs/
+│   └── screenshots/        # 터미널 CLI 입력·출력, 브라우저 접속, 트러블슈팅 실증 캡처본 (총 16장)
+├── .gitignore              # 민감정보(*.key, *.env, 토큰, 비밀번호) 및 OS 임시 파일 추적 배제
+├── Dockerfile              # nginx:alpine 기반 경량 웹 서버 컨테이너 이미지 빌드 명세서
+├── README.md               # 시스템 구조도, 체크리스트, 단계별 실습 로그, 비전공자 해설 보고서
+└── sample.txt              # 리눅스 터미널 CRUD 및 파일 권한 실습용 파일 (chmod 755 적용)
 ```
-
-</details>
 
 ---
 
@@ -427,9 +407,13 @@ git config --list
 # user.name=woogie0403
 # user.email=jaewook0403@gmail.com
 # init.defaultbranch=main
+# remote.origin.url=https://github.com/woogie0403/E1-1.git
 ```
 
-#### 🌐 GitHub 저장소 연동 증거 화면
+#### 🖥️ Git 사용자 설정 및 config 확인 터미널 실제 캡처
+![Git 사용자 설정 및 config 확인](docs/screenshots/term_step7_git.png)
+
+#### 🌐 GitHub 원격 저장소 연동 증거 화면
 ![GitHub 저장소 연동 증거](docs/screenshots/github_repo.png)
 
 ---
