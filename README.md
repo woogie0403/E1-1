@@ -63,6 +63,51 @@ curl http://localhost:8080
 
 본 워크스테이션은 윈도우 호스트 위에서 경량화된 리눅스 커널(WSL2)과 Docker 가상화 기술을 결합하여 완벽히 격리된 웹 서버 환경을 제공합니다:
 
+```mermaid
+flowchart LR
+    %% 1. 호스트 시스템 영역
+    subgraph Host ["💻 호스트 시스템 (Windows 10)"]
+        Browser["🌐 웹 브라우저 (Chrome)<br/>:8080 / :8081 / :8082"]
+        VSCode["📝 VS Code IDE<br/>작업실 편집 & Git 제어"]
+        HostApp["📁 로컬 코드 디렉토리<br/>~/workspace-lab/app"]
+    end
+
+    %% 2. 리눅스 가상화 계층
+    subgraph WSL ["🐧 가상화 서브시스템 (WSL 2 / Ubuntu 24.04)"]
+        LinuxCLI["⚡ 리눅스 CLI 환경<br/>POSIX 권한 (755 / 644 / 700)"]
+        DockerEngine["🐳 Docker Engine 데몬 (v29.9.2)"]
+    end
+
+    %% 3. 격리된 컨테이너 환경
+    subgraph Containers ["🚀 격리된 컨테이너 환경 (Docker Containers)"]
+        direction TB
+        subgraph WebServers ["🌐 커스텀 Nginx 웹 서버 (my-custom-web:1.0)"]
+            Web8080["my-web-8080 (Port 8080 ➡️ 80)"]
+            Web8081["my-web-8081 (Port 8081 ➡️ 80)"]
+            BindWeb["bind-test (Port 8082 ➡️ 80)"]
+        end
+
+        subgraph Storages ["💾 데이터 스토리지 계층"]
+            VolUbuntu["vol-test2 (Ubuntu 컨테이너)"]
+            NamedVol[("📦 도커 볼륨 (mydata)<br/>/var/lib/docker/volumes")]
+        end
+    end
+
+    %% 연결 관계 (포트 포워딩, 마운트, 제어)
+    Browser -->|"포트 포워딩 :8080"| Web8080
+    Browser -->|"포트 포워딩 :8081"| Web8081
+    Browser -->|"포트 포워딩 :8082"| BindWeb
+
+    HostApp <-->|"바인드 마운트 (-v)<br/>실시간 무재빌드 동기화"| BindWeb
+    VolUbuntu <-->|"데이터 영속 마운트 (-v)<br/>컨테이너 삭제 후에도 보존"| NamedVol
+
+    VSCode -->|"원격 터미널 연동"| LinuxCLI
+    LinuxCLI -->|"도커 CLI 명령 전달"| DockerEngine
+```
+
+<details>
+<summary><b>📐 텍스트 기반 아키텍처 다이어그램 (ASCII View 펼치기)</b></summary>
+
 ```text
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
 │ [호스트 시스템] Microsoft Windows 10 Home (Host OS)                                     │
@@ -95,6 +140,8 @@ curl http://localhost:8080
 │   호스트 ./app 폴더 실시간 동기화          독립 볼륨 'mydata' (컨테이너 삭제 후 영속)  │
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
+
+</details>
 
 ---
 
