@@ -172,7 +172,18 @@ cd workspace-lab
 pwd
 # [출력]: /home/jaeuk/workspace-lab
 
-# 2. 파일 생성 및 내용 확인
+# 숨김 파일(.) 포함 디렉토리 상세 목록 확인 (term_step1_env.png 캡처 동일)
+ls -la
+# [출력]:
+# total 20
+# drwxr-xr-x 5 jaeuk jaeuk 4096 Nov  4 23:38 .
+# drwxr-x--- 6 jaeuk jaeuk 4096 Nov  4 23:38 ..
+# drwxr-xr-x 2 jaeuk jaeuk 4096 Nov  4 23:38 app
+# drwxr-xr-x 2 jaeuk jaeuk 4096 Nov  4 23:38 docs
+# drwxr-xr-x 2 jaeuk jaeuk 4096 Nov  4 23:38 logs
+
+# 2. 파일 생성(빈 파일 touch 및 텍스트 파일 생성) & 내용 확인
+touch empty.txt && rm empty.txt  # 명세서 필수 요구: 빈 파일 생성 검증 후 정리
 echo "Linux Terminal Practice" > sample.txt
 cat sample.txt
 # [출력]: Linux Terminal Practice
@@ -233,9 +244,14 @@ ls -ld practice_dir
 도커 엔진 데몬 정상 구동을 확인한 뒤, 공식 `hello-world` 컨테이너를 가동하고, 백그라운드 우분투 컨테이너에서 `attach`와 `exec`의 종료/유지 차이를 관찰하였습니다.
 
 ```bash
-# 1. 도커 버전 및 데몬 가동 확인
+# 1. 도커 버전 및 데몬 가동 점검 (docker info)
 docker --version
 # [출력]: Docker version 29.9.2, build a82e528
+docker info | grep -E "Server Version|Operating System|Total Memory"
+# [출력]:
+#  Server Version: 29.9.2
+#  Operating System: Ubuntu 24.04 LTS
+#  Total Memory: 7.67GiB
 
 # 2. hello-world 컨테이너 가동 (첫 컨테이너 성공)
 docker run hello-world
@@ -255,6 +271,18 @@ root@b6c7e51b43d1:/# exit
 # 5. exit 후 컨테이너 생존 여부 재확인 (컨테이너 유지 증명!)
 docker ps
 # [출력]: b6c7e51b43d1   ubuntu   "sleep infinity"   Up About a minute   my-ubuntu
+
+# 6. 컨테이너 실행 로그 확인 (docker logs)
+docker logs naughty_joliot
+# [출력]:
+# Hello from Docker!
+# This message shows that your installation appears to be working correctly.
+
+# 7. 컨테이너 실시간 리소스 점검 (docker stats)
+docker stats --no-stream
+# [출력]:
+# CONTAINER ID   NAME        CPU %     MEM USAGE / LIMIT     MEM %     NET I/O     BLOCK I/O   PIDS
+# b6c7e51b43d1   my-ubuntu   0.00%     1.18MiB / 7.67GiB     0.01%     0B / 0B     0B / 0B     1
 ```
 
 #### 🖥️ 1) Docker 데몬 점검 및 hello-world 실행 캡처
@@ -275,7 +303,7 @@ docker ps
 #### `Dockerfile` 소스코드
 ```dockerfile
 FROM nginx:alpine
-LABEL maintainer="woogie0403"
+LABEL maintainer="jaeuk"
 LABEL description="Custom Nginx Web Server for Dev Workstation"
 ENV APP_ENV=production
 COPY app/index.html /usr/share/nginx/html/index.html
